@@ -11,11 +11,13 @@ app.init = function() {
 
 app.fetch = function() {
   $.ajax({
-    url: app.server,
+    url: app.server + '?order=-createdAt',
+    //'?order="-createdAt"',
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Data retrieved');
+      console.log(data);
       var messages = data.results;
       for (var i = 0; i < messages.length; i++) {
         app.renderMessage(messages[i]);
@@ -30,8 +32,6 @@ app.fetch = function() {
 var processFetch = function(data) {
   var messages = data.results;
   var $selector = $('.chatroomNames');
-
-
 };
 
 app.send = function(message) {
@@ -42,6 +42,8 @@ app.send = function(message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
+      app.clearMessages();
+      app.init();
     },
     error: function (data) {
       console.error('chatterbox: Failed to send message', data);
