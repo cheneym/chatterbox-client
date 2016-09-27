@@ -30,6 +30,7 @@ app.fetch = function(filter) {
         app.renderAllRooms();
         app.rendered = true;
       }
+      app.boldFriends();
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -66,7 +67,7 @@ app.renderMessage = function (message) {
   var $chats = $('#chats');
   var $chatBox = $('<div></div>').addClass('chat');
   var $name = $('<a></a>').addClass('username').attr('username', message.username).text(message.username + ':');
-  var $text = $('<p></p>').text(message.text);
+  var $text = $('<p></p>').text(message.text).addClass(message.username);
   $chatBox.append($name);
   $chatBox.append($text);
   $chats.append($chatBox);
@@ -97,6 +98,13 @@ app.renderAllRooms = function() {
 app.handleUsernameClick = function (username) {
   if (!(username in app.friends)) {
     app.friends[username] = username;
+
+  }
+};
+
+app.boldFriends = function () {
+  for (friend in app.friends) {
+    $('p.' + friend).addClass('bold');
   }
 };
 
@@ -114,6 +122,7 @@ app.handleSubmit = function () {
 $(document).ready(function() {
   $('body').on('click', '.username', function() {
     app.handleUsernameClick($(this).attr('username'));
+    app.boldFriends();
   });
   $('.submit').on('click', function(e) {
     e.preventDefault();
@@ -124,7 +133,10 @@ $(document).ready(function() {
     console.log(this.value);
     app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
   });
-
   app.init();
 });
 
+
+//add friend
+//sort by friend
+//escape
