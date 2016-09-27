@@ -1,23 +1,25 @@
 
 var myName = window.location.search.slice(10);
-console.log(myName);
 var app = {};
 
 app.server = 'https://api.parse.com/1/classes/messages';
+app.friends = {};
 
 app.init = function() {
-  //app.fetch();
+  app.fetch();
 };
 
 app.fetch = function() {
   $.ajax({
     url: app.server,
     type: 'GET',
-    data: JSON.stringify(message),
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
-
+      var messages = data.results;
+      for (var i = 0; i < messages.length; i++) {
+        app.renderMessage(messages[i]);
+      }
     },
     error: function (data) {
       console.error('chatterbox: Failed to send message', data);
@@ -29,17 +31,7 @@ var processFetch = function(data) {
   var messages = data.results;
   var $selector = $('.chatroomNames');
 
-  for (var i = 0; i < messages.length; i++) {
-    var $chats = $('#chats');
-    //var roomnames = 
-    // console.log(messages[i].roomname)
-    var $chatBox = $('<div></div>').addClass('chat');
-    var $name = $('<p></p>').addClass('username').text(messages[i].username + ':');
-    var $text = $('<p></p>').text(messages[i].text);
-    $chatBox.append($name);
-    $chatBox.append($text);
-    $chats.append($chatBox);
-  }
+
 };
 
 app.send = function(message) {
@@ -64,18 +56,12 @@ app.clearMessages = function() {
 app.renderMessage = function (message) {
   var $chats = $('#chats');
   var $chatBox = $('<div></div>').addClass('chat');
-  var $name = $('<p></p>').addClass('username').text(message.username + ':');
+  var $name = $('<a></a>').addClass('username').attr('username', message.username).text(message.username + ':');
   var $text = $('<p></p>').text(message.text);
   $chatBox.append($name);
   $chatBox.append($text);
-
-
-
   $chats.append($chatBox);
 };
-
-//<option value="lobby" selected>lobby</option>
-//<option value="superLobby">superLobby</option>
 
 
 app.renderRoom = function(roomName) {
@@ -83,18 +69,28 @@ app.renderRoom = function(roomName) {
   $('#roomSelect').append($roomOption);
 };
 
-$(document).ready(function() {
-  $('.submit').on('click', function() {
-    var formInfo = $('#form').serializeArray();
-    console.log(formInfo);
-    $('#form').trigger('reset');
-    var text = formInfo[0]['value'];
+app.handleUsernameClick = function (username) {
+  if (!(username in app.friends)) {
+    app.friends[username] = username;
+  }
+};
 
-    var message = {};
-    message.username = myName;
-    message.text = text;
-    message.roomname = 'lobby';
-    send(message);    
+$(document).ready(function() {
+  $('body').on('click', '.username', function() {
+    app.handleUsernameClick($(this).attr('username'));
   });
+  // $('.submit').on('click', function() {
+  //   var formInfo = $('#form').serializeArray();
+  //   console.log(formInfo);
+  //   $('#form').trigger('reset');
+  //   var text = formInfo[0]['value'];
+
+  //   var message = {};
+  //   message.username = myName;
+  //   message.text = text;
+  //   message.roomname = 'lobby';
+  //   send(message);    
+  // });
   //app.init();
 });
+
