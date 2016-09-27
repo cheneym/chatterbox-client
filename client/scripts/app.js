@@ -42,12 +42,6 @@ var processFetch = function(data) {
   }
 };
 
-// var message = {
-//   username: 'shawndrost',
-//   text: 'trololo',
-//   roomname: '4chan'
-// };
-
 app.send = function(message) {
   $.ajax({
     url: app.server,
@@ -62,6 +56,21 @@ app.send = function(message) {
     }
   });
 };
+
+app.clearMessages = function() {
+  $('#chats').empty();
+};
+
+app.renderMessage = function (message) {
+  var $chats = $('#chats');
+  var $chatBox = $('<div></div>').addClass('chat');
+  var $name = $('<p></p>').addClass('username').text(message.username + ':');
+  var $text = $('<p></p>').text(message.text);
+  $chatBox.append($name);
+  $chatBox.append($text);
+  $chats.append($chatBox);
+};
+
 
 $(document).ready(function() {
   $('.submit').on('click', function() {
