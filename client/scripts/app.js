@@ -4,15 +4,16 @@ var app = {};
 
 app.server = 'https://api.parse.com/1/classes/messages';
 app.friends = {};
+app.rooms = {};
 
 app.init = function() {
   app.fetch();
 };
 
 app.fetch = function() {
+  var order = '?order=-createdAt';
   $.ajax({
-    url: app.server + '?order=-createdAt',
-    //'?order="-createdAt"',
+    url: app.server + order,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
@@ -20,8 +21,10 @@ app.fetch = function() {
       console.log(data);
       var messages = data.results;
       for (var i = 0; i < messages.length; i++) {
+        app.addRoom(messages[i]);
         app.renderMessage(messages[i]);
       }
+      app.renderAllRooms();
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -65,10 +68,19 @@ app.renderMessage = function (message) {
   $chats.append($chatBox);
 };
 
+app.addRoom = function(message) {
+  app.rooms[message.roomname] = message.roomname;
+};
 
-app.renderRoom = function(roomName) {
-  $roomOption = $('<option></option>').val(roomName).text(roomName);
+app.renderRoom = function(roomname) {
+  $roomOption = $('<option></option>').val(roomname).text(roomname);
   $('#roomSelect').append($roomOption);
+};
+
+app.renderAllRooms = function() {
+  for (var roomname in app.rooms) {
+    app.renderRoom(app.rooms[roomname]);
+  }
 };
 
 app.handleUsernameClick = function (username) {
