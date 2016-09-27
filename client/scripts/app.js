@@ -10,10 +10,10 @@ app.init = function() {
   app.fetch();
 };
 
-app.fetch = function() {
-  var order = '?order=-createdAt';
+app.fetch = function(filter) {
+  filter = filter || '?order=-createdAt';
   $.ajax({
-    url: app.server + order,
+    url: app.server + filter,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
@@ -108,6 +108,14 @@ $(document).ready(function() {
     e.preventDefault();
     app.handleSubmit();    
   });
+  $('body').on('change', 'select', function(e) {
+    console.log();
+    app.clearMessages();
+    app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
+  });
+
+
+
   app.init();
 });
 
