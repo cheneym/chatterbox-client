@@ -68,9 +68,20 @@ app.renderMessage = function (message) {
   var $text = $('<p></p>').text(message.text);
   $chatBox.append($name);
   $chatBox.append($text);
+
+
+
   $chats.append($chatBox);
 };
 
+//<option value="lobby" selected>lobby</option>
+//<option value="superLobby">superLobby</option>
+
+
+app.renderRoom = function(roomName) {
+  $roomOption = $('<option></option>').val(roomName).text(roomName);
+  $('#roomSelect').append($roomOption);
+};
 
 $(document).ready(function() {
   $('.submit').on('click', function() {
