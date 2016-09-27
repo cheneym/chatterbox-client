@@ -30,13 +30,13 @@
       <form> Room:
         <select id="roomSelect">
         </select>
-      </form>
+      </form onsubmit="false">
       <!-- create textarea for new message posting -->
-      <form id='form'>
-        <input type="text" name="message" id="messageBox" placeholder=""/>
+      <form id="send">
+        <input type="text" name="message" id="messageBox" placeholder="">
+        <!--<input type="submit" class='submit' value='Submit'>-->
+        <button type="submit" class="submit"> Submit </button>
       </form>
-
-      <button class='submit'> Submit </button>
     </div>
     <div id="chats"></div>
   </body>

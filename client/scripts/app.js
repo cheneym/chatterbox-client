@@ -15,14 +15,14 @@ app.fetch = function() {
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message sent');
+      console.log('chatterbox: Data retrieved');
       var messages = data.results;
       for (var i = 0; i < messages.length; i++) {
         app.renderMessage(messages[i]);
       }
     },
     error: function (data) {
-      console.error('chatterbox: Failed to send message', data);
+      console.error('chatterbox: Failed to retrieve data', data);
     }
   });
 }; 
@@ -75,22 +75,25 @@ app.handleUsernameClick = function (username) {
   }
 };
 
+app.handleSubmit = function () {
+  var formInfo = $('#send').serializeArray();
+  $('#send').trigger('reset');
+  var text = formInfo[0]['value'];
+  var message = {};
+  message.username = myName;
+  message.text = text;
+  message.roomname = 'lobby';
+  app.send(message);
+};
+
 $(document).ready(function() {
   $('body').on('click', '.username', function() {
     app.handleUsernameClick($(this).attr('username'));
   });
-  // $('.submit').on('click', function() {
-  //   var formInfo = $('#form').serializeArray();
-  //   console.log(formInfo);
-  //   $('#form').trigger('reset');
-  //   var text = formInfo[0]['value'];
-
-  //   var message = {};
-  //   message.username = myName;
-  //   message.text = text;
-  //   message.roomname = 'lobby';
-  //   send(message);    
-  // });
-  //app.init();
+  $('.submit').on('click', function(e) {
+    e.preventDefault();
+    app.handleSubmit();    
+  });
+  app.init();
 });
 
