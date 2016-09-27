@@ -5,7 +5,7 @@ var app = {};
 app.server = 'https://api.parse.com/1/classes/messages';
 app.friends = {};
 app.rooms = {};
-
+app.rendered = false;
 app.init = function() {
   app.fetch();
 };
@@ -19,12 +19,17 @@ app.fetch = function(filter) {
     success: function (data) {
       console.log('chatterbox: Data retrieved');
       console.log(data);
+      app.clearMessages();
       var messages = data.results;
       for (var i = 0; i < messages.length; i++) {
         app.addRoom(messages[i]);
         app.renderMessage(messages[i]);
       }
-      app.renderAllRooms();
+      //app.clearRooms();
+      if (!app.rendered) {
+        app.renderAllRooms();
+        app.rendered = true;
+      }
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -45,8 +50,7 @@ app.send = function(message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
-      app.clearMessages();
-      app.init();
+      app.fetch('?where={"roomname": ' + JSON.stringify($('#roomSelect').find(':selected').text()) + ' }?order=-createdAt');
     },
     error: function (data) {
       console.error('chatterbox: Failed to send message', data);
@@ -66,6 +70,10 @@ app.renderMessage = function (message) {
   $chatBox.append($name);
   $chatBox.append($text);
   $chats.append($chatBox);
+};
+
+app.clearRooms = function() {
+  $('#roomSelect').empty();
 };
 
 app.addRoom = function(message) {
@@ -96,7 +104,7 @@ app.handleSubmit = function () {
   var message = {};
   message.username = myName;
   message.text = text;
-  message.roomname = 'lobby';
+  message.roomname = $('#roomSelect').find(':selected').text();
   app.send(message);
 };
 
@@ -109,12 +117,10 @@ $(document).ready(function() {
     app.handleSubmit();    
   });
   $('body').on('change', 'select', function(e) {
-    console.log();
-    app.clearMessages();
+    console.log(this);
+    console.log(this.value);
     app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
   });
-
-
 
   app.init();
 });
