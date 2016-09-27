@@ -86,8 +86,11 @@ app.renderRoom = function(roomname) {
 };
 
 app.renderAllRooms = function() {
+  app.renderRoom('lobby');
   for (var roomname in app.rooms) {
-    app.renderRoom(app.rooms[roomname]);
+    if (roomname !== 'lobby') {
+      app.renderRoom(app.rooms[roomname]);
+    }
   }
 };
 
