@@ -43,7 +43,7 @@ app.send = function(message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
-      app.fetch('?where={"roomname": ' + JSON.stringify($('#roomSelect').find(':selected').text()) + ' }?order=-createdAt');
+      app.fetch('?order=-createdAt');
     },
     error: function (data) {
       console.error('chatterbox: Failed to send message', data);
@@ -132,7 +132,6 @@ app.handleSubmit = function () {
   $('#send').trigger('reset');
   var text = formInfo[0]['value'];
   var message = {};
-  console.log(app.username, text);
   message.username = app.username;
   message.text = text;
   message.roomname = $('#roomSelect').find(':selected').text();
