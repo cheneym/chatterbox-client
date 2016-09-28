@@ -26,22 +26,8 @@ app.fetch = function(filter) {
       app.clearMessages();
       app.messages = data.results;
 
-
-      // for (var i = 0; i < app.messages.length; i++) {
-      //   app.addRoom(app.messages[i]);
-      //   app.renderMessage(app.messages[i]);
-      // }
-
-      //messages
       app.renderMessages(app.messages);
-      //rooms
       app.renderAllRooms(app.messages);
-
-      // if (!app.rendered) {
-      //   app.renderAllRooms();
-      //   app.rendered = true;
-      // }
-      app.boldFriends();
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -119,7 +105,6 @@ app.renderAllRooms = function(messages) {
 };
 
 app.handleRoomChange = function(event) {
-  //if 'New Room...' selected
   var index = $(event.currentTarget).prop('selectedIndex');
   if (index === 0) {
     var newRoom = prompt('Enter room name');
@@ -127,30 +112,19 @@ app.handleRoomChange = function(event) {
     $('#roomSelect').val(newRoom);
     app.roomname = newRoom;
   } else {
-    //go to selected room
     app.roomname = $('#roomSelect').find(':selected').text();
   }
   app.renderMessages(app.messages);
-  //app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
 };
 
-app.handleUsernameClick = function ( username) {
-  
+app.handleUsernameClick = function (event) {
+  var username = $(event.currentTarget).attr('username');
   if (!(username in app.friends)) {
     app.friends[username] = username;
-
   } else {
-
+    delete app.friends[username];
   }
-};
-
-
-//not used
-app.boldFriends = function () {
-  for (friend in app.friends) {
-    $('p.' + friend).toggleClass('bold');
-
-  }
+  $('p.' + username).toggleClass('bold');
 };
 
 app.handleSubmit = function () {
@@ -166,10 +140,7 @@ app.handleSubmit = function () {
 };
 
 $(document).ready(function() {
-  $('body').on('click', '.username', function() {
-    app.handleUsernameClick($(this).attr('username'));
-    app.boldFriends();
-  });
+  $('body').on('click', '.username', app.handleUsernameClick);
   $('.submit').on('click', function(e) {
     e.preventDefault();
     app.handleSubmit();    
