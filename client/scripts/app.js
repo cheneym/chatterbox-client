@@ -24,18 +24,23 @@ app.fetch = function(filter) {
       console.log('chatterbox: Data retrieved');
       console.log(data);
       app.clearMessages();
-      var messages = data.results;
+      app.messages = data.results;
 
 
-      for (var i = 0; i < messages.length; i++) {
-        app.addRoom(messages[i]);
-        app.renderMessage(messages[i]);
-      }
-      //app.clearRooms();
-      if (!app.rendered) {
-        app.renderAllRooms();
-        app.rendered = true;
-      }
+      // for (var i = 0; i < app.messages.length; i++) {
+      //   app.addRoom(app.messages[i]);
+      //   app.renderMessage(app.messages[i]);
+      // }
+
+      //messages
+      app.renderMessages(app.messages);
+      //rooms
+      app.renderAllRooms(app.messages);
+
+      // if (!app.rendered) {
+      //   app.renderAllRooms();
+      //   app.rendered = true;
+      // }
       app.boldFriends();
     },
     error: function (data) {
@@ -75,15 +80,17 @@ app.renderMessage = function (message) {
 };
 
 app.renderMessages = function(messages) {
+  app.clearMessages();
 
-};
-
-app.clearRooms = function() {
-  $('#roomSelect').empty();
-};
-
-app.handleRoomChange = function(event) {
-
+  messages.filter(function(message) {
+    if (app.roomname === 'lobby' && !message.roomname) {
+      return true;
+    } else if (app.roomname === message.roomname) {
+      return true;
+    } else {
+      return false;
+    }
+  }).forEach(app.renderMessage);
 };
 
 app.addRoom = function(message) {
@@ -95,17 +102,44 @@ app.renderRoom = function(roomname) {
   $('#roomSelect').append($roomOption);
 };
 
-app.renderAllRooms = function() {
+app.renderAllRooms = function(messages) {
   $('#roomSelect').html('<option val="newRoom">New Room...</option>');
-  for (var roomname in app.rooms) {
-    app.renderRoom(app.rooms[roomname]);
+  
+  var rooms = {};
+  if (messages) {
+    messages.forEach(function(message) {
+      if (message.roomname && !(message.roomname in rooms)) {
+        app.renderRoom(message.roomname);
+        rooms[message.roomname] = true;
+      }
+    });
   }
+
   $('#roomSelect').val(app.roomname);
 };
 
+app.handleRoomChange = function(event) {
+  //if 'New Room...' selected
+  var index = $(event.currentTarget).prop('selectedIndex');
+  if (index === 0) {
+    var newRoom = prompt('Enter room name');
+    app.renderRoom(newRoom);
+    $('#roomSelect').val(newRoom);
+    app.roomname = newRoom;
+  } else {
+    //go to selected room
+    app.roomname = $('#roomSelect').find(':selected').text();
+  }
+  app.renderMessages(app.messages);
+  //app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
+};
+
 app.handleUsernameClick = function ( username) {
+  
   if (!(username in app.friends)) {
     app.friends[username] = username;
+
+  } else {
 
   }
 };
@@ -114,7 +148,8 @@ app.handleUsernameClick = function ( username) {
 //not used
 app.boldFriends = function () {
   for (friend in app.friends) {
-    $('p.' + friend).addClass('bold');
+    $('p.' + friend).toggleClass('bold');
+
   }
 };
 
@@ -139,24 +174,7 @@ $(document).ready(function() {
     e.preventDefault();
     app.handleSubmit();    
   });
-  $('body').on('change', 'select', function(e) {
-    //if 'New Room...' selected
-    var index = $(e.currentTarget).prop('selectedIndex');
-    if (index === 0) {
-      var newRoom = prompt('Enter room name');
-      app.renderRoom(newRoom);
-      $('#roomSelect').val(newRoom);
-    }
-      //go to new blank room
-
-    //else {
-    app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
-    //}
-  });
+  $('body').on('change', 'select', app.handleRoomChange);
   app.init();
 });
 
-
-//add friend
-//sort by friend
-//escape
