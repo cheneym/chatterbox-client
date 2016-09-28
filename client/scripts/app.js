@@ -12,6 +12,7 @@ app.messages = [];
 app.init = function() {
   app.fetch();
   app.username = window.location.search.slice(10);
+  //setInterval(app.fetch, 2000);
 };
 
 app.fetch = function(filter) {
@@ -28,6 +29,7 @@ app.fetch = function(filter) {
 
       app.renderMessages(app.messages);
       app.renderAllRooms(app.messages);
+      app.renderBoldText();
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -69,7 +71,7 @@ app.renderMessages = function(messages) {
   app.clearMessages();
 
   messages.filter(function(message) {
-    if (app.roomname === 'lobby' && !message.roomname) {
+    if (app.roomname === 'lobby') {
       return true;
     } else if (app.roomname === message.roomname) {
       return true;
