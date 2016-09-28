@@ -1,13 +1,17 @@
 
-var myName = window.location.search.slice(10);
 var app = {};
 
 app.server = 'https://api.parse.com/1/classes/messages';
 app.friends = {};
 app.rooms = {};
 app.rendered = false;
+app.roomname = 'lobby';
+app.username = 'anonymous';
+app.messages = [];
+
 app.init = function() {
   app.fetch();
+  app.username = window.location.search.slice(10);
 };
 
 app.fetch = function(filter) {
@@ -21,6 +25,8 @@ app.fetch = function(filter) {
       console.log(data);
       app.clearMessages();
       var messages = data.results;
+
+
       for (var i = 0; i < messages.length; i++) {
         app.addRoom(messages[i]);
         app.renderMessage(messages[i]);
@@ -36,11 +42,6 @@ app.fetch = function(filter) {
       console.error('chatterbox: Failed to retrieve data', data);
     }
   });
-}; 
-
-var processFetch = function(data) {
-  var messages = data.results;
-  var $selector = $('.chatroomNames');
 };
 
 app.send = function(message) {
@@ -73,8 +74,16 @@ app.renderMessage = function (message) {
   $chats.append($chatBox);
 };
 
+app.renderMessages = function(messages) {
+
+};
+
 app.clearRooms = function() {
   $('#roomSelect').empty();
+};
+
+app.handleRoomChange = function(event) {
+
 };
 
 app.addRoom = function(message) {
@@ -87,21 +96,22 @@ app.renderRoom = function(roomname) {
 };
 
 app.renderAllRooms = function() {
-  app.renderRoom('lobby');
+  $('#roomSelect').html('<option val="newRoom">New Room...</option>');
   for (var roomname in app.rooms) {
-    if (roomname !== 'lobby') {
-      app.renderRoom(app.rooms[roomname]);
-    }
+    app.renderRoom(app.rooms[roomname]);
   }
+  $('#roomSelect').val(app.roomname);
 };
 
-app.handleUsernameClick = function (username) {
+app.handleUsernameClick = function ( username) {
   if (!(username in app.friends)) {
     app.friends[username] = username;
 
   }
 };
 
+
+//not used
 app.boldFriends = function () {
   for (friend in app.friends) {
     $('p.' + friend).addClass('bold');
@@ -113,7 +123,8 @@ app.handleSubmit = function () {
   $('#send').trigger('reset');
   var text = formInfo[0]['value'];
   var message = {};
-  message.username = myName;
+  console.log(app.username, text);
+  message.username = app.username;
   message.text = text;
   message.roomname = $('#roomSelect').find(':selected').text();
   app.send(message);
@@ -129,9 +140,18 @@ $(document).ready(function() {
     app.handleSubmit();    
   });
   $('body').on('change', 'select', function(e) {
-    console.log(this);
-    console.log(this.value);
+    //if 'New Room...' selected
+    var index = $(e.currentTarget).prop('selectedIndex');
+    if (index === 0) {
+      var newRoom = prompt('Enter room name');
+      app.renderRoom(newRoom);
+      $('#roomSelect').val(newRoom);
+    }
+      //go to new blank room
+
+    //else {
     app.fetch('?where={"roomname": ' + JSON.stringify(this.value) + ' }?order=-createdAt');
+    //}
   });
   app.init();
 });
