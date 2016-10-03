@@ -4,10 +4,9 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
-    <link href="https://fonts.googleapis.com/css?family=David+Libre" rel="stylesheet">
+
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
@@ -26,20 +25,23 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <!-- create dropdown for chatroom choice -->
-      <form onsubmit="false"> Room:
+      <!-- Your HTML goes here! -->
+
+      <div class="spinner"><img src="images/spiffygif_46x46.gif"></div>
+      <div id="rooms">
+        Room:
         <select id="roomSelect">
         </select>
-        <!--<input type="text" name="room" id="roomName" placeholder="">
-        <button type="submit" class="submit-roomname"> Submit </button> -->
-      </form onsubmit="false">
-      <!-- create textarea for new message posting -->
-      <form id="send">
-        <input type="text" name="message" id="messageBox" placeholder="">
-        <!--<input type="submit" class='submit' value='Submit'>-->
-        <button type="submit" class="submit"> Submit </button>
-      </form>
-    </div>
+      </div>
+      <form action="#" id="send" method="post">
+        <input type="text" name="message" id="message"/>
+        <input type="submit" name="submit" class="submit"/>
+      </form>    </div>
     <div id="chats"></div>
-  </body>
+
+    <script>
+      $(function(){
+        app.init()
+      });
+    </script>  </body>
 </html>
